@@ -1,8 +1,33 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 language: R
-sudo: false
 cache: packages
+
+matrix:
+  include:
+    - r: oldrel
+    - r: release
+    - r: devel
+    - os: osx
+      fortran: false
+      latex: false
+
+addons:
+  apt:
+    update: true
+    sources:
+      - sourceline: 'ppa:opencpu/imagemagick'  
+    packages:
+      - libfreetype6
+      - libmagick++-dev
+
+# work around temporary travis + R 3.5 bug
+r_packages: devtools
+
+env:
+  global:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+
+before_install:
+  - Rscript -e 'update.packages(ask = FALSE)'
 
 after_success:
   - Rscript -e 'covr::codecov()'
